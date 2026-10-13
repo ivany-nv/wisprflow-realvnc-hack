@@ -17,9 +17,10 @@
 -- put the text back on the clipboard, re-activate the Viewer (which pushes it to Linux), send Ctrl+V.
 
 require("hs.ipc")
+local _ = hs.application  -- trigger the lazy load now, so its "-- Loading extension" line isn't printed into status()
 
 local M = {}
-M.version = "1.0.0"
+M.version = "1.0.1"
 
 local defaults = {
   vncApps           = { "RealVNC Viewer", "VNC Viewer" }, -- older RealVNC builds are named "VNC Viewer"
@@ -62,6 +63,14 @@ local function now() return hs.timer.secondsSinceEpoch() end
 local function contains(list, value)
   for _, v in ipairs(list) do if v == value then return true end end
   return false
+end
+
+-- Exact-name lookup; hs.application.get() also matches partial names ("VNC Viewer" finds "RealVNC Viewer").
+local function runningApp(name)
+  for _, a in ipairs(hs.application.runningApplications()) do
+    if a:name() == name then return a end
+  end
+  return nil
 end
 
 local function frontApp() return hs.application.frontmostApplication() end
@@ -126,7 +135,7 @@ local function sendPaste(method)
 end
 
 local function activateBounceApp(name)
-  local app = hs.application.get(name)
+  local app = runningApp(name)
   if app then app:activate() else hs.application.launchOrFocus(name) end
 end
 
@@ -303,7 +312,7 @@ function M.status()
   local function apps(names)
     local out = {}
     for _, n in ipairs(names) do
-      out[#out + 1] = n .. (hs.application.get(n) and " (running)" or " (not running)")
+      out[#out + 1] = n .. (runningApp(n) and " (running)" or " (not running)")
     end
     return table.concat(out, ", ")
   end

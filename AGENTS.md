@@ -89,7 +89,9 @@ All of these must hold:
 - `key tap: enabled, modifier tap: enabled`
 - `dictationApps: Wispr Flow (running)`. If it shows `not running`, ask the user to open Wispr
   Flow and check again.
-- `vncApps:` shows at least one name as `(running)` once the user has a VNC session open.
+- `vncApps:` shows at least one name as `(running)` once the user has a VNC session open. The
+  other default name showing `(not running)` is normal: names are matched exactly, and each
+  RealVNC version uses only one of them.
 
 If an app shows `not running` even though it is open, the app's name differs on this Mac. List
 the real names:
